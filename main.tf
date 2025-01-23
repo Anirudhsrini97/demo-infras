@@ -7,16 +7,16 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket         = "my-demo-server-bucket"      # Replace with your S3 bucket name
-    key            = "terraform/state/filepath" # Replace with the desired state file path
-    region         = "us-east-1"                # Replace with your bucket region
-    encrypt        = true                       # Encrypt state file
+    bucket  = "my-demo-server-bucket"    # Replace with your S3 bucket name
+    key     = "terraform/state/filepath" # Replace with the desired state file path
+    region  = "us-east-1"                # Replace with your bucket region
+    encrypt = true                       # Encrypt state file
   }
 }
 
 # Create a key pair (replace with your key pair details if needed)
 resource "aws_key_pair" "my_key" {
-  key_name   = "my-key" # Replace with your desired key name
+  key_name   = "my-key"                  # Replace with your desired key name
   public_key = file("~/.ssh/id_rsa.pub") # Path to your public key
 }
 
@@ -33,9 +33,9 @@ resource "aws_security_group" "allow_ssh_http" {
   }
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
     security_groups = [aws_security_group.elb_sg.id] # Reference the ELB SG
   }
 
@@ -49,11 +49,11 @@ resource "aws_security_group" "allow_ssh_http" {
 
 # Launch an EC2 instance
 resource "aws_instance" "dev_trial_instance" {
-  ami           = "ami-0885b1f6bd170450c" # Ubuntu 20.04 LTS AMI (Free Tier eligible)
-  instance_type = "t2.micro"              # Free tier instance type
+  ami               = "ami-0885b1f6bd170450c" # Ubuntu 20.04 LTS AMI (Free Tier eligible)
+  instance_type     = "t2.micro"              # Free tier instance type
   availability_zone = "us-east-1a"
-  key_name      = aws_key_pair.my_key.key_name
-  security_groups = [aws_security_group.allow_ssh_http.name]
+  key_name          = aws_key_pair.my_key.key_name
+  security_groups   = [aws_security_group.allow_ssh_http.name]
 
   tags = {
     Name = "dev_trial_instance"
@@ -86,9 +86,9 @@ resource "aws_acm_certificate" "ssl_cert" {
 resource "aws_route53_record" "validation_record" {
   for_each = {
     for dvo in aws_acm_certificate.ssl_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      type   = dvo.resource_record_type
-      value  = dvo.resource_record_value
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
     }
   }
 

@@ -4,7 +4,7 @@ variable "region" {
 
 variable "domain_name" {
   description = "connectwithanirudh.com"
-  default = "connectwithanirudh.com"
+  default     = "connectwithanirudh.com"
 }
 
 variable "subdomain" {
@@ -14,10 +14,10 @@ variable "subdomain" {
 
 variable "vpc_id" {
   default = "vpc-09403303d27768485"
-  type = string
+  type    = string
 }
 
 variable "subnets" {
   default = ["subnet-0bdcc2deba00f7cb6", "subnet-0f39845d89a614a8b"]
-  type = list(string)
+  type    = list(string)
 }
