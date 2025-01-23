@@ -75,6 +75,9 @@ jobs:
         with:
           terraform_version: 1.5.7 # Use the desired Terraform version
 
+      - name: Initialize Terraform
+        run: terraform init
+
       - name: Download Plan File
         uses: actions/download-artifact@v3
         with:
