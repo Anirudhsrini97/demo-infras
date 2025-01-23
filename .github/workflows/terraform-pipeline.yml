@@ -1,0 +1,77 @@
+name: Terraform Pipeline
+
+on:
+  push:
+    branches:
+      - main # Change to your default branch if not 'main'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job for linting Terraform code
+  lint:
+    name: Terraform Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7 # Use the desired Terraform version
+
+      - name: Lint Terraform code
+        run: terraform fmt -check -recursive
+
+  # Job for Terraform init and plan
+  plan:
+    name: Terraform Init and Plan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7 # Use the desired Terraform version
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
+      - name: Upload Plan File
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: tfplan
+
+  # Job for Terraform Apply
+  apply:
+    name: Terraform Apply
+    needs: plan # Ensures 'apply' runs only after 'plan'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7 # Use the desired Terraform version
+
+      - name: Download Plan File
+        uses: actions/download-artifact@v3
+        with:
+          name: terraform-plan
+          path: ./tfplan
+
+      - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: terraform apply tfplan
