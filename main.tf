@@ -1,6 +1,7 @@
 # Specify the provider
 provider "aws" {
   region = "us-east-1" # Replace with your preferred AWS region
+  version = "~> 5.84.0"
 }
 
 #S3 Bucket to store the file in persistant manner
