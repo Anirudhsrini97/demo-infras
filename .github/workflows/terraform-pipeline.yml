@@ -42,6 +42,13 @@ jobs:
         with:
           terraform_version: 1.5.7 # Use the desired Terraform version
 
+      - name: Create SSH Key File
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
+          chmod 600 ~/.ssh/id_rsa.pub  # change permission to 600
+        shell: bash
+
       - name: Initialize Terraform
         run: terraform init
 
