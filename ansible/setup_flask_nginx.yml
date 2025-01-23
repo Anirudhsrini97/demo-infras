@@ -1,0 +1,130 @@
+---
+- name: Setup Flask Application with Nginx
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Update the package cache
+      apt:
+        update_cache: yes
+
+    # Install required packages
+    - name: Install Nginx, Git, and Python packages
+      apt:
+        name:
+          - nginx
+          - git
+          - python3
+          - python3-pip
+          - python3-venv
+        state: present
+
+    - name: Remove the default Nginx configuration
+      file:
+        path: /etc/nginx/sites-available/default
+        state: absent
+      become: yes
+    - name: Remove the default Nginx symbolic link
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+      become: yes
+
+    # Clone the repository
+    - name: Clone the repository
+      git:
+        repo: "git@github.com:Anirudhsrini97/demo-server.git"
+        dest: "/home/ubuntu/demo-server"
+        version: "HEAD"
+        accept_hostkey: yes
+      become: no
+      register: git_clone_status
+
+    # Create a virtual environment
+    - name: Create a virtual environment if it does not exist
+      command: python3 -m venv /home/ubuntu/demo-server/venv
+      args:
+        creates: /home/ubuntu/demo-server/venv/bin/activate
+
+    # Install dependencies from requirements.txt
+    - name: Install dependencies from requirements.txt
+      pip:
+        requirements: /home/ubuntu/demo-server/requirements.txt
+        virtualenv: /home/ubuntu/demo-server/venv
+        virtualenv_command: /usr/bin/python3 -m venv
+
+    # Create the systemctl service definition file
+    - name: Create systemd service file for Flask application
+      copy:
+        dest: /etc/systemd/system/flask_app.service
+        content: |
+          [Unit]
+          Description=Flask Application
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          WorkingDirectory=/home/ubuntu/demo-server
+          Environment="FLASK_ENV=production"
+          Environment="PYTHONPATH=/home/ubuntu/demo-server"
+          ExecStart=/home/ubuntu/demo-server/venv/bin/python /home/ubuntu/demo-server/app.py
+          Restart=always
+          StandardOutput=append:/var/log/flask_app.log
+          StandardError=append:/var/log/flask_app.log
+
+          [Install]
+          WantedBy=multi-user.target
+      notify:
+        - Reload systemd
+
+    # Create symbolic link for the service
+    - name: Enable the Flask application service
+      systemd:
+        name: flask_app
+        enabled: true
+        state: started
+
+    # Create Nginx configuration file
+    - name: Create Nginx configuration for Flask application
+      copy:
+        dest: /etc/nginx/conf.d/flask_app.conf
+        content: |
+          server {
+              listen 80;
+              server_name _;
+
+              location / {
+                  proxy_pass http://127.0.0.1:8080;
+                  proxy_set_header Host $host;
+                  proxy_set_header X-Real-IP $remote_addr;
+                  proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              }
+          }
+      notify:
+        - Reload Nginx
+
+    - name: Test Nginx configuration
+      command: nginx -t
+      become: yes
+
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
+      become: yes
+
+    # Ensure the service is running
+    - name: Check the /health endpoint
+      uri:
+        url: http://127.0.0.1/health
+        method: GET
+        status_code: 200
+
+  handlers:
+    - name: Reload systemd
+      command: systemctl daemon-reload
+
+    - name: Reload Nginx
+      service:
+        name: nginx
+        state: reloaded
