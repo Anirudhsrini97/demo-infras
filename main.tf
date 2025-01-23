@@ -1,7 +1,6 @@
 # Specify the provider
 provider "aws" {
-  region  = "us-east-1" # Replace with your preferred AWS region
-  version = "~> 5.84.0"
+  region = "us-east-1" # Replace with your preferred AWS region
 }
 
 #S3 Bucket to store the file in persistant manner
@@ -12,6 +11,12 @@ terraform {
     key     = "terraform/state/filepath" # Replace with the desired state file path
     region  = "us-east-1"                # Replace with your bucket region
     encrypt = true                       # Encrypt state file
+  }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.84.0" # Specify your version constraint here
+    }
   }
 }
 
