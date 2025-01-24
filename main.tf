@@ -206,3 +206,6 @@ resource "aws_route53_record" "www_subdomain" {
   }
 }
 
+output "aws_ec2_instance_public_dns" {
+  value = aws_instance.dev_trial_instance.public_dns
+}
