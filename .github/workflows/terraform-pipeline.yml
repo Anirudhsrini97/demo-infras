@@ -107,13 +107,9 @@ jobs:
 
       - name: Set Output from Previous Step
         id: set_output
-        run: |
-          echo "public_dns=$DNS" >> $GITHUB_OUTPUT
+        run: echo "public_dns=$DNS" >> $GITHUB_OUTPUT
         env:
           DNS: ${{ env.DNS }}
-
-      - name: Use Output for Validation
-        run: echo "The public DNS is: ${{ steps.set_output.outputs.public_dns }}"
 
   # Job for Ansible
   run-ansible:
