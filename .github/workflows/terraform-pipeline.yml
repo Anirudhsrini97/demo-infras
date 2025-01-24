@@ -20,7 +20,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.7 # Use the desired Terraform version
+          terraform_version: 1.10.4 # Use the desired Terraform version
 
       - name: Lint Terraform code
         run: terraform fmt -check -recursive
@@ -40,7 +40,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.7 # Use the desired Terraform version
+          terraform_version: 1.10.4 # Use the desired Terraform version
 
       - name: Create SSH Key File
         run: |
@@ -78,7 +78,7 @@ jobs:
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.7
+          terraform_version: 1.10.4
 
       - name: Create SSH Key File
         run: |
