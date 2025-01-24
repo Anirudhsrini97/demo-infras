@@ -101,7 +101,7 @@ jobs:
 
       - name: Get Terraform Output
         id: get_output
-        run: echo "public_dns=$(terraform output -raw aws_ec2_instance_public_dns)" >> $GITHUB_OUTPUT
+        run: echo "public_dns=$(terraform output -raw aws_ec2_instance_public_dns | tr -d '\n')" >> $GITHUB_OUTPUT
 
   # Job for Ansible
   run-ansible:
