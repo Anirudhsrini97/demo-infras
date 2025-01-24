@@ -124,4 +124,5 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ansible
 
       - name: Run Ansible Playbook
+        working-directory: ansible
         run: ansible-playbook -i inventory.ini setup_flask_nginx.yml
