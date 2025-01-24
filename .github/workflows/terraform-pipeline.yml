@@ -99,9 +99,21 @@ jobs:
       - name: Terraform Apply
         run: terraform apply tfplan
 
-      - name: Get Terraform Output
-        id: get_output
-        run: echo "public_dns=$(terraform output -raw aws_ec2_instance_public_dns | tr -d '\n')" >> $GITHUB_OUTPUT
+      - name: Run Terraform Command and Store Output
+        id: get_dns
+        run: |
+          export DNS=$(terraform output -raw aws_ec2_instance_public_dns | tr -d '\n')
+          echo "DNS=$DNS" >> $GITHUB_ENV
+
+      - name: Set Output from Previous Step
+        id: set_output
+        run: |
+          echo "public_dns=$DNS" >> $GITHUB_OUTPUT
+        env:
+          DNS: ${{ env.DNS }}
+
+      - name: Use Output for Validation
+        run: echo "The public DNS is: ${{ steps.set_output.outputs.public_dns }}"
 
   # Job for Ansible
   run-ansible:
