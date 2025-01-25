@@ -100,7 +100,6 @@ jobs:
         run: terraform apply tfplan
 
       - name: Run Terraform Command and Store Output - 1
-        id: get_dns
         env:
           TF_LOG: ERROR
         run: terraform output -raw aws_ec2_instance_public_dns
