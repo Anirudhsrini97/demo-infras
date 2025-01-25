@@ -109,7 +109,7 @@ jobs:
         env:
           TF_LOG: ERROR
         run: |
-            DNS=$(terraform output -raw aws_ec2_instance_public_dns | sed -E 's/.*output -raw aws_ec2_instance_public_dns//')
+            DNS=$(terraform output -raw aws_ec2_instance_public_dns | sed -E 's/.*output -raw aws_ec2_instance_public_dns//' | tr -d '\n' | awk '{$1=$1};1')
             VALUE=$(echo "$DNS" | awk -F'::' '{print $1}' | awk '{$1=$1};1')
             echo "extracted: $VALUE"
             echo "public_dns=$DNS" >> $GITHUB_OUTPUT
