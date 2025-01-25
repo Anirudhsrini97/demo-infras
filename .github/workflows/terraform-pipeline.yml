@@ -101,6 +101,8 @@ jobs:
 
       - name: Run Terraform Command and Store Output
         id: get_dns
+        env:
+          TF_LOG: ERROR
         run: |
           DNS=$(terraform output -raw aws_ec2_instance_public_dns | tr -d '\n')
           echo "Clean DNS: $DNS" # To verify the cleaned value
