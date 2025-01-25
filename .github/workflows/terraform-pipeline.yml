@@ -138,11 +138,11 @@ jobs:
           ssh-keyscan -H github.com >> ~/.ssh/known_hosts
         shell: bash
 
-#       - name: scp the private key into ths server
-#         env:
-#           HOST_DNS: ${{ needs.apply.outputs.public_dns }}
-#         run: |
-#           scp -o StrictHostKeyChecking=no ~/.ssh/id_rsa ubunutu@$HOST_DNS:/home/ubuntu/.ssh/id_rsa
+      - name: scp the private key into ths server
+        env:
+          HOST_DNS: ${{ needs.apply.outputs.public_dns }}
+        run: |
+          scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ~/.ssh/id_rsa ubunutu@$HOST_DNS:/home/ubuntu/.ssh/id_rsa
 
       - name: Install Ansible
         run: sudo apt-get update && sudo apt-get install -y ansible
