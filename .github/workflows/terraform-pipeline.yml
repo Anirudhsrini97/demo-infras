@@ -109,8 +109,9 @@ jobs:
         env:
           TF_LOG: ERROR
         run: |
-          terraform output -raw aws_ec2_instance_public_dns | tr -d '\n')
-          echo "Clean DNS: $DNS" # To verify the cleaned value
+          RAW_OUTPUT=$(terraform output -raw aws_ec2_instance_public_dns)
+          DNS=$(echo "$RAW_OUTPUT" | awk -F'::' '{print $1}')
+          echo "DNS value is: $DNS"
           echo "DNS=$DNS" >> $GITHUB_ENV
 
       - name: Set Output from Previous Step
