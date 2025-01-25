@@ -70,7 +70,7 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     outputs:
-      public_dns: ${{ steps.get_output.outputs.public_dns }}
+      public_dns: ${{ steps.get_output.outputs.get_dns }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -109,16 +109,9 @@ jobs:
         env:
           TF_LOG: ERROR
         run: |
-          RAW_OUTPUT=$(terraform output -raw aws_ec2_instance_public_dns)
-          DNS=$(echo "$RAW_OUTPUT" | awk -F'::' '{print $1}')
-          echo "DNS value is: $DNS"
-          echo "DNS=$DNS" >> $GITHUB_ENV
-
-      - name: Set Output from Previous Step
-        id: set_output
-        run: echo "public_dns=$DNS" >> $GITHUB_OUTPUT
-        env:
-          DNS: ${{ env.DNS }}
+            terraform output -raw aws_ec2_instance_public_dns > dns_output.txt
+            DNS=$(cat dns_output.txt | tr -d '\n')
+            echo "public_dns=$DNS" >> $GITHUB_OUTPUT
 
   # Job for Ansible
   run-ansible:
