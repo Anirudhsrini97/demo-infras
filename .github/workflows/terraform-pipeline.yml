@@ -142,7 +142,6 @@ jobs:
         env:
           HOST_DNS: ${{ needs.apply.outputs.public_dns }}
         run: |
-          ssh-keyscan -H $HOST_DNS >> ~/.ssh/known_hosts
           scp -o StrictHostKeyChecking=no ~/.ssh/id_rsa ubunutu@$HOST_DNS:/home/ubuntu/.ssh/id_rsa
 
       - name: Install Ansible
