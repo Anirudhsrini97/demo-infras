@@ -108,11 +108,8 @@ jobs:
         id: get_dns
         env:
           TF_LOG: ERROR
-        run: |
-            terraform output -raw aws_ec2_instance_public_dns > dns_output.txt
-            cat dns_output.txt
-            DNS=$(cat dns_output.txt | awk -F'::' '{print $1}' | tr -d '\n')
-            echo "public_dns=$DNS" >> $GITHUB_OUTPUT
+        run: ./extract_dns.sh
+        shell: bash
 
   # Job for Ansible
   run-ansible:
