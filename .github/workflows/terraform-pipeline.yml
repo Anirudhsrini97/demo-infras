@@ -109,9 +109,7 @@ jobs:
         env:
           TF_LOG: ERROR
         run: |
-            terraform output -raw aws_ec2_instance_public_dns > dns_output.txt
-            cat dns_output.txt
-            DNS=$(cat dns_output.txt | sed -E 's/.*output -raw aws_ec2_instance_public_dns//')
+            DNS=$(terraform output -raw aws_ec2_instance_public_dns | sed -E 's/.*output -raw aws_ec2_instance_public_dns//')
             echo "DNS is $DNS"
             echo "public_dns=$DNS" >> $GITHUB_OUTPUT
 
