@@ -103,6 +103,7 @@ jobs:
         id: get_dns
         run: |
           export DNS=$(terraform output -raw aws_ec2_instance_public_dns | tr -d '\n')
+          echo "this is dns :$DNS"
           echo "DNS=$DNS" >> $GITHUB_ENV
 
       - name: Set Output from Previous Step
