@@ -111,6 +111,7 @@ jobs:
         run: |
             DNS=$(terraform output -raw aws_ec2_instance_public_dns | sed -E 's/.*output -raw aws_ec2_instance_public_dns//')
             echo "DNS is $DNS"
+            echo "Direct value is $(terraform output -raw aws_ec2_instance_public_dns)"
             echo "public_dns=$DNS" >> $GITHUB_OUTPUT
 
   # Job for Ansible
