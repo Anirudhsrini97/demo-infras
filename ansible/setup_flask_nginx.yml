@@ -1,5 +1,5 @@
 ---
-- name: Setup Flask Application with Nginx
+- name: Setup Flask Application with Nginx and Docker
   hosts: all
   become: yes
 
@@ -24,6 +24,7 @@
         path: /etc/nginx/sites-available/default
         state: absent
       become: yes
+
     - name: Remove the default Nginx symbolic link
       file:
         path: /etc/nginx/sites-enabled/default
@@ -58,6 +59,56 @@
         name: nginx
         state: reloaded
       become: yes
+
+    # Install Docker dependencies
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    # Add Docker’s official GPG key
+    - name: Add Docker's official GPG key
+      command: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+    # Set up the stable Docker repository
+    - name: Set up Docker stable repository
+      command: echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+
+    # Update the package cache again
+    - name: Update the package cache for Docker
+      apt:
+        update_cache: yes
+
+    # Install Docker
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+
+    # Add the user to the Docker group
+    - name: Add current user to Docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    # Install Docker Compose
+    - name: Download Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.26.0/docker-compose-$(uname -s)-$(uname -m)
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    # Verify Docker Compose installation
+    - name: Verify Docker Compose installation
+      command: docker-compose --version
 
   handlers:
     - name: Reload systemd
